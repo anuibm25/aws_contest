@@ -430,6 +430,40 @@ export class App {
     this.responderQuery = '';
   }
 
+  // No-op placeholder used by header toolbar when forecast hour changes
+  noop(): void {
+    // Intentionally empty - placeholder for bindings in template
+  }
+
+  // Placeholder handler for assigning a responder from the victim list
+  onAssignResponder(payload: { clusterId?: string; responderId?: string } | any): void {
+    // Minimal implementation: log and mark responder assigned in local state if possible
+    try {
+      console.log('Assign responder payload:', payload);
+      // If payload contains mapping, update responders/routes as a simple local change
+      if (payload && payload.responderId && payload.clusterId) {
+        // find responder and add a simple assignment marker on it
+        const responder = this._responders.find(r => r.id === payload.responderId);
+        if (responder) {
+          (responder as any).assignedTo = payload.clusterId;
+        }
+        this.cdr.markForCheck();
+      }
+    } catch (e) {
+      // swallow errors to keep UI responsive
+    }
+  }
+
+  // Placeholder handler for adding a note to a victim cluster
+  onAddNote(note: { clusterId?: string; text?: string } | any): void {
+    console.log('Add note:', note);
+    // For demo purposes append a notification event
+    if (note && note.text) {
+      this.notificationEvents.unshift({ id: String(Date.now()), type: 'other', message: note.text, timestamp: new Date().toISOString(), read: false });
+      this.cdr.markForCheck();
+    }
+  }
+
   onNotificationFilterChange(type: string) {
     this.notificationFilter = type;
   }
